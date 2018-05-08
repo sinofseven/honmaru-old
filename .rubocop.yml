@@ -1,0 +1,19 @@
+inherit_from: .rubocop_todo.yml
+
+AllCops:
+  Exclude:
+    - 'tmp/**/*'
+    - 'vendor/**/*'
+
+Metrics/LineLength:
+  Max: 150
+Style/Documentation:
+  Enabled: false
+Metrics/BlockLength:
+  Max: 50
+Metrics/MethodLength:
+  Max: 240
+Style/Next:
+  Enabled: false
+Metrics/AbcSize:
+  Max: 160
