@@ -6,7 +6,7 @@ module Honmaru
     option '--disable-auto-stop', type: :boolean, default: false
     option '--interval', type: :numeric, default: 5
     option '--client-request-token', type: :string
-    option '--verbose', alias: '-v', type: :boolean, default: true
+    option '--verbose', aliases: '-v', type: :boolean, default: false
     option '--is-delete', type: :boolean, default: false
     def listen
       opt = options.to_hash

@@ -9,20 +9,34 @@ module Honmaru
       @cfn = cfn
       @pastel = Pastel.new
       @verbose = opt['verbose']
-      is_delete = opt['is-delete']
-      repeat(is_delete: is_delete)
+      @is_delete = opt['is-delete']
+      start_expression
+      repeat
     end
 
     private
 
+    def start_expression
+      honmaru = @pastel.yellow('honmaru')
+      puts "#{honmaru} : start listening"
+      return unless @verbose
+      puts "#{honmaru} :   stack-name = #{@stack_name}"
+      puts "#{honmaru} :   only-once = #{@only_once}"
+      puts "#{honmaru} :   disable-auto-stop = #{@disable_auto_stop}"
+      puts "#{honmaru} :   interval = #{@interval}"
+      puts "#{honmaru} :   client-request-token = #{@client_request_token.nil? ? 'null' : "\"#{@client_request_token}\""}"
+      puts "#{honmaru} :   is-delete = #{@is_delete}"
+      puts "#{honmaru} :   verbose = #{@verbose}"
+    end
+
     def colored_event_text(event)
-      status = event.resource_status
+      status = @pastel.yellow(event.resource_status)
       if !(event.resource_status =~ /FAILED$/).nil?
-        status = @pastel.red(status)
+        status = @pastel.red(event.resource_status)
       elsif !(event.resource_status =~ /COMPLETE$/).nil?
-        status = @pastel.green(status)
+        status = @pastel.green(event.resource_status)
       end
-      "#{@pastel.yellow('CloudFormation')} - #{status} - #{event.resource_type} - #{event.logical_resource_id}"
+      "CloudFormation - #{status} - #{event.resource_type} - #{event.logical_resource_id}"
     end
 
     def get_events(next_token: nil)
@@ -46,7 +60,7 @@ module Honmaru
       end
     end
 
-    def repeat(is_delete: false)
+    def repeat
       last_event = nil
       errors = []
       f_first = false
@@ -59,7 +73,7 @@ module Honmaru
           begin
             events = get_events
           rescue Aws::CloudFormation::Errors::ValidationError => e
-            if is_delete
+            if @is_delete
               break unless (e.message =~ /does not exist$/).nil?
             end
             raise e
